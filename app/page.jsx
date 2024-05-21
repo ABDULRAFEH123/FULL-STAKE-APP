@@ -13,7 +13,7 @@ export default function Home() {
 
     // Cleanup function to clear the timeout if the component unmounts
     return () => clearTimeout(timer);
-  }, []);
+  }, [router]);
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-gray-100">

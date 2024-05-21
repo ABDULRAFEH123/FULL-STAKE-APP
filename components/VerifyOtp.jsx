@@ -1,11 +1,11 @@
 "use client";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
+import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { ImSpinner8 } from "react-icons/im";
 
-export default function verifyOtp() {
+export default function VerifyOtp() {
   const inputRef = useRef([]);
   const [inputs, setInputs] = useState(Array(6).fill("")); // Assuming a 6-digit OTP for simplicity
   const [otpLoader, setOtpLoader] = useState(false);
