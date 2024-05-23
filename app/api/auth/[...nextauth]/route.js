@@ -82,14 +82,14 @@ export const authOptions = {
           session.user.accessToken = token.accessToken;
         }
       }
-      console.log(session,"its overall session..");
+      // console.log(session,"its overall session..");
 
       return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/home", // Custom sign-in page
+    signIn: "/signup", // Custom sign-in page
   },
 };
 
