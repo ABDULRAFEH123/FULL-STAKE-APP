@@ -82,7 +82,7 @@ export const authOptions = {
           session.user.accessToken = token.accessToken;
         }
       }
-      // console.log(session,"its overall session..");
+      console.log(session,"its overall session..");
 
       return session;
     },
