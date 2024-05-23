@@ -68,7 +68,6 @@ export default function Signup() {
         console.log("User registration failed.");
       }
     } catch (error) {
-      setSignupLoader(false);
       console.log("Error during registration: ", error);
       setError("An error occurred during registration.");
     }

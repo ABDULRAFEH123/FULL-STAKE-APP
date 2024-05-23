@@ -1,19 +1,37 @@
 "use client"
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import LogRocket from 'logrocket';
+
+// Ensure LogRocket is initialized on the client-side
+if (typeof window !== 'undefined') {
+  LogRocket.init('ys1zro/demo');
+}
 
 export default function Home() {
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
-    // Wait for 2 seconds before redirecting
+    // Redirect after 2 seconds
     const timer = setTimeout(() => {
       router.push('/login');
     }, 2000);
 
-    // Cleanup function to clear the timeout if the component unmounts
     return () => clearTimeout(timer);
   }, [router]);
+
+  useEffect(() => {
+    // Identify the user with LogRocket if the session is available
+    if (status === 'authenticated' && session) {
+      LogRocket.identify(session.user.id, {
+        name: session.user.name,
+        email: session.user.email,
+        // You can add more user-specific properties here
+      });
+    }
+  }, [session, status]);
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-gray-100">

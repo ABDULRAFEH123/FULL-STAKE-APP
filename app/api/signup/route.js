@@ -19,7 +19,11 @@ export async function POST(req) {
       password: hashedPassword,
       location:"",
       about:"",
-      subscription:"",
+      subscription: { // default values for new users
+        status: "inactive", // assume 'inactive' until they subscribe
+        planId: null,
+        subscriptionId: null, 
+      },
     });
     // console.log(newUser, "its ne user...");
     // Generate JWT access token

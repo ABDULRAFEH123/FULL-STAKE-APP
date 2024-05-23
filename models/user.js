@@ -5,41 +5,24 @@ import dotenv from "dotenv";
 //  and new records as required ok..(if we wants to add the new field in any record oin db)
 
 dotenv.config();
+const subscriptionSchema = new mongoose.Schema({
+  status: { type: String, enum: ['inactive', 'pending', 'active'], default: 'inactive' },
+  subscriptionId: { type: String, default: null },
+  planId: { type: String, default: null },
+  createdDate: { type: Date, default: null },
+  endingDate: { type: Date, default: null },
+  active: { type: Boolean, default: false }
+});
 
 // Define the schema
-const userSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    password: {
-      type: String,
-      required: true,
-    },
-    location: {
-      type: String,
-      default: "", // You can set a default value here if desired
-    },
-    about: {
-      type: String,
-      default: "", // You can set a default value here if desired
-    },
-    subscription: {
-      active: { type: Boolean, default: false },
-      planId: { type: String, default: null },  // Stores the Stripe plan ID
-    },
-    otp: String,
-    otpExpiry: Date,
-    
-  },
-  { timestamps: true }
-);
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  location: { type: String, default: '' },
+  about: { type: String, default: '' },
+  subscription: { type: subscriptionSchema, default: () => ({}) }
+}, { timestamps: true });
 
 // Ensure the model is singleton
 const User = mongoose.models.User || mongoose.model("User", userSchema);
@@ -59,20 +42,28 @@ async function connectMongoDB() {
     // console.log("Already connected to MongoDB");
   }
 }
-async function normalizeSubscriptionField() {
+
+async function normalizeSubscriptionFields() {
+  await connectMongoDB();
+
   try {
     const result = await User.updateMany(
-      { "subscription": { $type: "bool" } }, // filter documents where `subscription` is a boolean
+      { "subscription": { $exists: false } },
       {
         $set: {
-          "subscription": {
-            "active": false, // default value
-            "planId": null   // default value
+          "subscription": { 
+            "status": "inactive",
+            "subscriptionId": null, 
+            "createdDate": null,
+            "endingDate": null,
+            "active": false,
+            "planId": null,
           }
         }
-      }
+      },
+      { multi: true }
     );
-    console.log('Normalized subscription fields:', result);
+    // console.log('Normalized subscription fields:', result);
   } catch (error) {
     console.error("Error normalizing subscription fields:", error);
   }
@@ -80,32 +71,35 @@ async function normalizeSubscriptionField() {
 
 // Function to update all users
 async function addFieldsToUsers() {
-  await normalizeSubscriptionField(); // Ensure all documents are normalized
+  await normalizeSubscriptionFields(); 
+  
+  const priceId = "not found"
+
   try {
     const result = await User.updateMany(
-  
- 
+      {},
       {
         $set: {
-          location: "",
+          location: "", 
           about: "",
-          "subscription.active": true,   // Set active to true, indicating subscription is active
-          "subscription.planId": priceId // Set planId to the Stripe price ID
+          "subscription.status": "inactive",
+          "subscription.subscriptionId": null,
+          "subscription.createdDate": null,
+          "subscription.endingDate": null,
+          "subscription.active": false,
+          "subscription.planId": priceId,
         },
       },
-      { upsert: false, multi: true }
+      { multi: true }
     );
-    // console.log('Result:', result);
-    // console.log(`${result.nModified} users updated successfully`);
+    // console.log('Updated users:', result);
   } catch (error) {
     console.error("Error updating users:", error);
   }
 }
 
-// Export the model and any additional functions
 export { User, connectMongoDB, addFieldsToUsers };
 
-// Run updates when file is loaded
 (async () => {
   await connectMongoDB();
   await addFieldsToUsers();
