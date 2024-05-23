@@ -39,6 +39,9 @@ export const authOptions = {
     maxAge: 30 * 24 * 60 * 60, // Session expiration time in seconds
   },
   callbacks: {
+    async signIn({ account, profile }) {
+return true;
+    },
     jwt: async ({ token, user, account ,trigger,session}) => {
       // new code to update the user info like name address and location
       if(trigger === "update"){
@@ -89,7 +92,9 @@ export const authOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/signup", // Custom sign-in page
+    signIn: "/login", 
+    signOut: "/login",
+    signUp: "/signup",// Custom sign-in pag
   },
 };
 
