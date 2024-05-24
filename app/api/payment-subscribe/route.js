@@ -21,8 +21,8 @@ export async function POST(req) {
         },
       ],
       mode: "subscription",
-      success_url: `http://localhost:3000/home`,
-      cancel_url: `http://localhost:3000/home`,
+      success_url: process.env.SUCCESS_REDIRECT_STRIPE_LINK,
+      cancel_url: process.env.CANCEL_REDIRECT_STRIPE_LINK,
     });
 
     // Update user document in MongoDB to mark as pending subscription
