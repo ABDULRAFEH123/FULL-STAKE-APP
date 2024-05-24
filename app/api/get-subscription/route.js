@@ -1,4 +1,4 @@
-// /api/get-subscriptions.js
+// /api/get-subscription.js
 import { connectMongoDB } from "@/lib/mongodb";
 import User from "../../../models/user"; // Adjust the import based on your directory structure
 import { NextResponse } from "next/server";
@@ -11,7 +11,7 @@ export async function POST(req, res) {
 
   try {
     const user = await User.findOne({ email: email });
-    console.log(user,"whole obj of user ")
+    // console.log(user,"whole obj of user ")
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }

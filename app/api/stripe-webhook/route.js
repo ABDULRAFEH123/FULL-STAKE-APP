@@ -5,7 +5,7 @@ import User from '../../../models/user'; // Adjust the import based on your dire
 import { connectMongoDB } from '@/lib/mongodb';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const endpointSecret = process.env.LOCAL_STRIPE_WEBHOOK_SECRET;
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(req) {
   await connectMongoDB();

@@ -40,14 +40,13 @@ export const authOptions = {
   },
   callbacks: {
     async signIn({ account, profile }) {
-return true;
+      return true;
     },
-    jwt: async ({ token, user, account ,trigger,session}) => {
+    jwt: async ({ token, user, account, trigger, session }) => {
       // new code to update the user info like name address and location
-      if(trigger === "update"){
-        return {...token,...session.user}
+      if (trigger === "update") {
+        return { ...token, ...session.user };
       }
-      
 
       if (account && user) {
         // This happens only on the first login, so you can capture tokens from the account
@@ -61,7 +60,7 @@ return true;
         token.name = user.name;
         token.location = user.location;
         token.about = user.about;
-        token.subscription=user.subscription
+        token.subscription = user.subscription;
         // Generate access token using jwt.sign
         token.accessToken = jwt.sign(
           { userId: user._id },
@@ -69,8 +68,6 @@ return true;
         );
       }
       return token;
-    
-    
     },
     session: async ({ session, token }) => {
       // Ensure the session includes all necessary user details
@@ -78,23 +75,23 @@ return true;
         session.user.id = token.uid;
         session.user.email = token.email;
         session.user.name = token.name;
-        session.user.subscription=token.subscription;
+        session.user.subscription = token.subscription;
         // session.user.location = token.location;
         // session.user.about = token.about;
         if (token.accessToken) {
           session.user.accessToken = token.accessToken;
         }
       }
-      // console.log(session,"its overall session..");
+      console.log(session,"its overall session..");
 
       return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/login", 
+    signIn: "/login",
     signOut: "/login",
-    signUp: "/signup",// Custom sign-in pag
+    signUp: "/signup", // Custom sign-in pag
   },
 };
 

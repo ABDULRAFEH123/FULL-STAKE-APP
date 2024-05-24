@@ -54,7 +54,7 @@ const Modal = ({ show, onClose }) => {
 
       await update(updatedSession);
 
-      console.log("Session updated:", updatedSession);
+      // console.log("Session updated:", updatedSession);
   
       onClose();
     } else {
@@ -67,12 +67,12 @@ const Modal = ({ show, onClose }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-25 p-2">
       <article className="bg-white max-h-[90vh] max-w-[500px] mx-auto rounded-[16px] overflow-hidden flex flex-col shadow-[0_15px_30px_0_rgba(0,0,0,0.25)] sm:w-[90%]">
         <header className="p-4 border-b border-[#ddd] flex items-center justify-between">
-          <h1 className="flex items-center gap-2 leading-[1] font-bold text-[1.125rem]">
+          <h1 className="flex items-center gap-2 leading-[1] font-bold text-[1.125rem] text-black">
             <TbSettingsShare size={30} />
             Update Your Profile
           </h1>
           <button
-            className="p-0 border-0 bg-transparent w-10 h-10 flex items-center justify-center leading-[1] cursor-pointer rounded-[8px] transition-[0.15s_ease] hover:bg-[#dfdad7]"
+            className="p-0 border-0 bg-transparent  text-black w-10 h-10 flex items-center justify-center leading-[1] cursor-pointer rounded-[8px] transition-[0.15s_ease] hover:bg-[#dfdad7]"
             onClick={onClose}
           >
             <svg
@@ -94,7 +94,7 @@ const Modal = ({ show, onClose }) => {
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm  font-medium text-black"
             >
               Name
             </label>
@@ -104,13 +104,13 @@ const Modal = ({ show, onClose }) => {
               name="name"
               onChange={handleNameChange}
               value={name}
-              className="mt-1 block w-full  px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#750550] focus:border-[#750550]"
+              className="mt-1 block w-full  px-3 py-2 text-black border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#750550] focus:border-[#750550]"
             />
           </div>
           <div>
             <label
               htmlFor="location"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-black"
             >
               Location
             </label>
@@ -120,13 +120,13 @@ const Modal = ({ show, onClose }) => {
               name="location"
               value={location}
               onChange={handleLocationChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#750550] focus:border-[#750550]"
+              className="mt-1 block w-full px-3 py-2 text-black border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#750550] focus:border-[#750550]"
             />
           </div>
           <div>
             <label
               htmlFor="about"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-black"
             >
               About
             </label>
@@ -136,13 +136,13 @@ const Modal = ({ show, onClose }) => {
               value={about}
               onChange={handleAboutChange}
               rows="4"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#750550] focus:border-[#750550]"
+              className="mt-1 block w-full px-3 py-2 text-black border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#750550] focus:border-[#750550]"
             ></textarea>
           </div>
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-black"
             >
               Email
             </label>
@@ -151,7 +151,7 @@ const Modal = ({ show, onClose }) => {
               id="email"
               name="email"
               value={session?.user?.email || "No data found"}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed focus:outline-none focus:ring-gray-200 focus:border-gray-200"
+              className="mt-1 block w-full text-black px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed focus:outline-none focus:ring-gray-200 focus:border-gray-200"
               disabled
             />
           </div>
@@ -160,7 +160,7 @@ const Modal = ({ show, onClose }) => {
         <footer className="p-5 flex items-center justify-end border-t border-[#ddd] gap-3 relative">
           <button
             onClick={onClose}
-            className="px-5 py-3 rounded-[8px] bg-transparent border-0 font-semibold cursor-pointer transition-[0.15s_ease] hover:bg-[#dfdad7]"
+            className="px-5 py-3 text-white rounded-[8px] bg-[#f02121c2] border-0 font-semibold cursor-pointer transition-[0.15s_ease] "
           >
             Decline
           </button>

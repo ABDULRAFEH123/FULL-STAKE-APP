@@ -37,7 +37,7 @@ export default function Home() {
   return (
     <>
       <div className="flex justify-between items-center bg-gray-800 text-white p-4">
-        <div className="text-lg font-bold">Your App Name</div>
+        <div className="text-lg font-bold"><UpdateProfile/></div>
         <div className="flex items-center gap-4">
           <div>
             <span className="font-semibold">Name:</span> {session?.user?.name}

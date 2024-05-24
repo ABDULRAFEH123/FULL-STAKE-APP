@@ -74,11 +74,23 @@ const PricingCards = () => {
     },
   ];
 
+  // Initialize state from local storage on first render
+  useEffect(() => {
+    const storedSubscription = localStorage.getItem("subscription");
+    if (storedSubscription) {
+      const subscriptionData = JSON.parse(storedSubscription);
+      setSubscribedPlan(subscriptionData);
+      setShowUnsubscribe(subscriptionData.active);
+    }
+  }, []);
+
+  // Fetch subscription when session changes
   useEffect(() => {
     if (session) {
       fetchSubscription(session.user.email);
     }
   }, [session]);
+
   const fetchSubscription = async (email) => {
     try {
       const response = await fetch("/api/get-subscription", {
@@ -91,17 +103,20 @@ const PricingCards = () => {
 
       const data = await response.json();
       if (response.ok && data.subscription) {
-        // Store the entire subscription object
+        // Update state and local storage with new subscription data
         setSubscribedPlan(data.subscription);
-        setShowUnsubscribe(data.subscription.active); // Use the 'active' field to toggle the Unsubscribe button
+        setShowUnsubscribe(data.subscription.active);
+        localStorage.setItem("subscription", JSON.stringify(data.subscription));
       } else {
-        setShowUnsubscribe(false); // Hide Unsubscribe if user hasn't subscribed
+        // Only reset state and local storage if there's no valid subscription
+        setSubscribedPlan(null);
+        setShowUnsubscribe(false);
+        localStorage.removeItem("subscription");
       }
     } catch (error) {
       console.error("Error fetching subscription", error);
     }
   };
-
   const handleSubscribe = async (priceId) => {
     if (!session) return;
 
@@ -135,7 +150,7 @@ const PricingCards = () => {
 
   const handleUnsubscribe = async () => {
     if (!session || !subscribedPlan) return;
-  
+
     try {
       const response = await fetch("/api/payment-unsubscribe", {
         method: "POST",
@@ -147,9 +162,9 @@ const PricingCards = () => {
           email: session.user.email,
         }),
       });
-  
+
       const data = await response.json();
-      console.log(data,"its data .. of unsub..")
+      console.log(data, "its data .. of unsub..");
       if (response.ok) {
         setSubscribedPlan(null);
         setShowUnsubscribe(false);
@@ -160,58 +175,56 @@ const PricingCards = () => {
       console.error("Unsubscribe error", error);
     }
   };
-  
-
 
   return (
     <div className="container mx-auto md:px-[13rem] py-8">
-    <div className="grid grid-cols-2 gap-8">
-      {plans.map((plan) => (
-        <div
-          key={plan.name}
-          className="custom_card_shadow p-6 bg-white rounded-lg flex flex-col items-center text-center space-y-4"
-        >
-          <div className="text-xl font-bold text-gray-800">{plan.name}</div>
-          <div className="text-lg font-semibold text-gray-600">
-            {plan.price}
-          </div>
-          {plan.icon}
-          <ul className="flex flex-col space-y-2">
-            {plan.features.map((feature, index) => (
-              <li
-                key={index}
-                className="text-sm text-gray-700 flex items-center gap-2"
+      <div className="grid grid-cols-2 gap-8">
+        {plans.map((plan) => (
+          <div
+            key={plan.name}
+            className="custom_card_shadow p-6 bg-white rounded-lg flex flex-col items-center text-center space-y-4"
+          >
+            <div className="text-xl font-bold text-gray-800">{plan.name}</div>
+            <div className="text-lg font-semibold text-gray-600">
+              {plan.price}
+            </div>
+            {plan.icon}
+            <ul className="flex flex-col space-y-2">
+              {plan.features.map((feature, index) => (
+                <li
+                
+                  key={index}
+                  className="text-sm text-gray-700 flex items-center gap-2"
+                >
+                  {plan.featureIcon}
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            {/* Always show the Subscribe button */}
+            {subscribedPlan &&
+            subscribedPlan.active &&
+            subscribedPlan.planId === plan.priceId ? (
+              <button
+                onClick={handleUnsubscribe}
+                className={`${plan.unsubscribeButtonColor} text-white font-bold py-2 px-6 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-opacity-50`}
+                disabled={loadingPlan === plan.priceId}
               >
-                {plan.featureIcon}
-                {feature}
-              </li>
-            ))}
-          </ul>
-          {/* Always show the Subscribe button */}
-          {subscribedPlan && subscribedPlan.active && subscribedPlan.planId === plan.priceId ? (
-            <button
-              onClick={handleUnsubscribe}
-              className={`${plan.unsubscribeButtonColor} text-white font-bold py-2 px-6 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-opacity-50`}
-              disabled={loadingPlan === plan.priceId}
-            >
-              Unsubscribe
-            </button>
-          ) : (
-            <button
-              onClick={() => handleSubscribe(plan.priceId)}
-              className={`${plan.buttonColor} text-white font-bold py-2 px-6 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-opacity-50`}
-              disabled={loadingPlan === plan.priceId}
-            >
-              {loadingPlan === plan.priceId
-                ? "Processing..."
-                : "Subscribe"}
-            </button>
-          )}
-        </div>
-      ))}
+                Unsubscribe
+              </button>
+            ) : (
+              <button
+                onClick={() => handleSubscribe(plan.priceId)}
+                className={`${plan.buttonColor} text-white font-bold py-2 px-6 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-opacity-50`}
+                disabled={loadingPlan === plan.priceId}
+              >
+                {loadingPlan === plan.priceId ? "Processing..." : "Subscribe"}
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
-  </div>
-  
   );
 };
 
