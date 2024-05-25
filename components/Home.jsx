@@ -21,7 +21,7 @@ export default function Home() {
 
   useEffect(() => {
     if (session && session.user) {
-      console.log("Session Data:", session); // Debug: Check what's in the session
+      // console.log("Session Data:", session); // Debug: Check what's in the session
       // Store session information in local storage (not recommended for AccessToken)
       localStorage.setItem(
         "session",

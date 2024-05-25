@@ -9,6 +9,7 @@ export async function POST(req) {
   await connectMongoDB();
   const { subscriptionId, email } = await req.json(); // Using email instead of userId
 
+
   try {
     // Cancel the subscription from Stripe
     const deleted = await stripe.subscriptions.cancel(subscriptionId);
@@ -19,17 +20,21 @@ export async function POST(req) {
       { email: email },
       {
         $set: {
+          "subscription.status":"inactive",
           "subscription.active": false,
           "subscription.planId": null,
           "subscription.pending": false,
-          "subscription.subscriptionId": null, // Remove the subscription ID
+          "subscription.subscriptionId": null, 
+          "subscription.createdDate":null,
+          "subscription.endingDate":null,
+
         },
       },
     );
 
     console.log("Update result:", updateResult);
 
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json({message:"Subscription Removed SuccessFully.."},{ success: true }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

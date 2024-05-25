@@ -9,6 +9,7 @@ export async function POST(req, res) {
   const { email } = await req.json();
   console.log(email, "email here");
 
+  
   try {
     const user = await User.findOne({ email: email });
     // console.log(user,"whole obj of user ")

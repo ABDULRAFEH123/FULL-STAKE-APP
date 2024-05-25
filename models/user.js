@@ -70,32 +70,47 @@ async function normalizeSubscriptionFields() {
 }
 
 // Function to update all users
-async function addFieldsToUsers() {
-  await normalizeSubscriptionFields(); 
-  
-  const priceId = "not found"
+let fieldsInitialized = false;
 
-  try {
-    const result = await User.updateMany(
-      {},
-      {
-        $set: {
-          location: "", 
-          about: "",
-          "subscription.status": "inactive",
-          "subscription.subscriptionId": null,
-          "subscription.createdDate": null,
-          "subscription.endingDate": null,
-          "subscription.active": false,
-          "subscription.planId": priceId,
+
+async function addFieldsToUsers() {
+  // so i commment some code here.. beacsue. of the issue and the issue is that when i buy 
+  // the subscription then this fucntion call on every ctrl+s... and this fucntion add new fields...
+  // to the db due to that ..things my new data overwrite and as a result .. my old subs data lost...
+
+  if (!fieldsInitialized) {
+    await normalizeSubscriptionFields();
+
+    // const priceId = "not found";
+
+  
+    try {
+      const result = await User.updateMany(
+        {},
+        {
+          $set: {
+            location: "",
+            about: "",
+            // "subscription.status": "inactive",
+            // "subscription.subscriptionId": null,
+            // "subscription.createdDate": null,
+            // "subscription.endingDate": null,
+            // "subscription.active": false,
+            // "subscription.planId": priceId,
+          },
         },
-      },
-      { multi: true }
-    );
-    // console.log('Updated users:', result);
-  } catch (error) {
-    console.error("Error updating users:", error);
+        { multi: true }
+      );
+      // console.log('Updated users:', result);
+
+
+
+      fieldsInitialized = true; // Update flag to indicate fields are added
+    } catch (error) {
+      console.error("Error updating users:", error);
+    }
   }
+
 }
 
 export { User, connectMongoDB, addFieldsToUsers };

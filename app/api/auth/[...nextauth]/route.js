@@ -60,7 +60,7 @@ export const authOptions = {
         token.name = user.name;
         token.location = user.location;
         token.about = user.about;
-        token.subscription = user.subscription;
+        token.subscription = user.subscription ? user.subscription.status : 'inactive'; // Add subscription status
         // Generate access token using jwt.sign
         token.accessToken = jwt.sign(
           { userId: user._id },
@@ -75,7 +75,7 @@ export const authOptions = {
         session.user.id = token.uid;
         session.user.email = token.email;
         session.user.name = token.name;
-        session.user.subscription = token.subscription;
+        session.user.subscription = token.subscription; // Ensure subscription is included
         // session.user.location = token.location;
         // session.user.about = token.about;
         if (token.accessToken) {

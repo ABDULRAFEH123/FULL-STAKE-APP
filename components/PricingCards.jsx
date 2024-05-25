@@ -1,15 +1,15 @@
 "use client";
+import { update } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { FaBicycle, FaCar, FaPlane, FaRocket, FaCheck } from "react-icons/fa";
 import { useSession } from "next-auth/react";
-
+import CancellationModal from './CancellationModal';
 const PricingCards = () => {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const [loadingPlan, setLoadingPlan] = useState(null);
-  const [subscribedPlan, setSubscribedPlan] = useState({
-    active: false, // Default to inactive
-  });
-
+  const [showModal, setShowModal] = useState(false);
+  const [subscribedPlan, setSubscribedPlan] = useState(null);
+  // THIS STATE IS JUST FOR BTN OF SUBSCIBE TO SHOW OR UNSUBSBE BTN TO SHOW OK
   const [showUnsubscribe, setShowUnsubscribe] = useState(false);
   const plans = [
     {
@@ -100,23 +100,51 @@ const PricingCards = () => {
         },
         body: JSON.stringify({ email }),
       });
-
       const data = await response.json();
       if (response.ok && data.subscription) {
         // Update state and local storage with new subscription data
         setSubscribedPlan(data.subscription);
         setShowUnsubscribe(data.subscription.active);
         localStorage.setItem("subscription", JSON.stringify(data.subscription));
+
+        // Update NextAuth session
+        updateSession(data.subscription.active);
       } else {
         // Only reset state and local storage if there's no valid subscription
         setSubscribedPlan(null);
         setShowUnsubscribe(false);
         localStorage.removeItem("subscription");
+
+        // Update NextAuth session
+        updateSession(false);
       }
     } catch (error) {
       console.error("Error fetching subscription", error);
     }
   };
+
+  const updateSession = async (isActive) => {
+    console.log("Updating session with:", isActive ? "active" : "inactive");
+    if (
+      session &&
+      session.user.subscription !== (isActive ? "active" : "inactive")
+    ) {
+      try {
+        await update({
+          ...session,
+          user: {
+            ...session.user,
+            subscription: isActive ? "active" : "inactive",
+          },
+        });
+        console.log("Session updated successfully");
+      } catch (error) {
+        console.error("Error updating session", error);
+      }
+    }
+    console.log(session, "Updated session...");
+  };
+
   const handleSubscribe = async (priceId) => {
     if (!session) return;
 
@@ -149,16 +177,17 @@ const PricingCards = () => {
   };
 
   const handleUnsubscribe = async () => {
-    if (!session || !subscribedPlan) return;
+    if (!session || !subscribedPlan ||loadingPlan) return;
 
     try {
+      setLoadingPlan(true);
       const response = await fetch("/api/payment-unsubscribe", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          subscriptionId: subscribedPlan.subscriptionId, // Assuming subscribedPlan contains the subscription ID
+          subscriptionId: subscribedPlan.subscriptionId,
           email: session.user.email,
         }),
       });
@@ -173,7 +202,14 @@ const PricingCards = () => {
       }
     } catch (error) {
       console.error("Unsubscribe error", error);
+    } finally {
+      setLoadingPlan(false);
+      setShowModal(false);
     }
+  };
+
+  const handleCancelSubscription = () => {
+    setShowModal(false);
   };
 
   return (
@@ -184,6 +220,7 @@ const PricingCards = () => {
             key={plan.name}
             className="custom_card_shadow p-6 bg-white rounded-lg flex flex-col items-center text-center space-y-4"
           >
+            {/* Display plan information */}
             <div className="text-xl font-bold text-gray-800">{plan.name}</div>
             <div className="text-lg font-semibold text-gray-600">
               {plan.price}
@@ -192,7 +229,6 @@ const PricingCards = () => {
             <ul className="flex flex-col space-y-2">
               {plan.features.map((feature, index) => (
                 <li
-                
                   key={index}
                   className="text-sm text-gray-700 flex items-center gap-2"
                 >
@@ -201,22 +237,32 @@ const PricingCards = () => {
                 </li>
               ))}
             </ul>
-            {/* Always show the Subscribe button */}
+
+            {/* Render subscription/unsubscription buttons */}
             {subscribedPlan &&
             subscribedPlan.active &&
             subscribedPlan.planId === plan.priceId ? (
+              // Render Unsubscribe button if this plan is active
               <button
-                onClick={handleUnsubscribe}
-                className={`${plan.unsubscribeButtonColor} text-white font-bold py-2 px-6 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-opacity-50`}
-                disabled={loadingPlan === plan.priceId}
-              >
-                Unsubscribe
-              </button>
+              onClick={() => setShowModal(true)}
+              disabled={loadingPlan}
+              className={`${plan.unsubscribeButtonColor} text-white font-bold py-2 px-6 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-opacity-50`}
+            >
+             {loadingPlan? "Processing...":"UnSubscribe"}
+            </button>
+      
             ) : (
+              // Render Subscribe button if this plan is not active
               <button
-                onClick={() => handleSubscribe(plan.priceId)}
+                onClick={() => {
+                  handleSubscribe(plan.priceId);
+                  setSubscribedPlan({ active: true, planId: plan.priceId });
+                }}
                 className={`${plan.buttonColor} text-white font-bold py-2 px-6 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-opacity-50`}
-                disabled={loadingPlan === plan.priceId}
+                disabled={
+                  loadingPlan === plan.priceId ||
+                  (subscribedPlan && subscribedPlan.active)
+                }
               >
                 {loadingPlan === plan.priceId ? "Processing..." : "Subscribe"}
               </button>
@@ -224,6 +270,13 @@ const PricingCards = () => {
           </div>
         ))}
       </div>
+        {/* Cancellation modal */}
+        <CancellationModal
+        loadingPlan={loadingPlan}
+        isOpen={showModal}
+        onCancel={handleCancelSubscription}
+        onConfirm={handleUnsubscribe}
+      />
     </div>
   );
 };

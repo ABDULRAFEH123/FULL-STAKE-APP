@@ -1,37 +1,32 @@
-"use client"
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import LogRocket from 'logrocket';
-
-// Ensure LogRocket is initialized on the client-side
-if (typeof window !== 'undefined') {
-  LogRocket.init('ys1zro/demo');
-}
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
   const router = useRouter();
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    // Redirect after 2 seconds
-    const timer = setTimeout(() => {
-      router.push('/login');
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [router]);
-
-  useEffect(() => {
-    // Identify the user with LogRocket if the session is available
-    if (status === 'authenticated' && session) {
-      LogRocket.identify(session.user.id, {
-        name: session.user.name,
-        email: session.user.email,
-        // You can add more user-specific properties here
-      });
+    if (status === "loading") {
+      // Wait for the session to be loaded
+      return;
     }
-  }, [session, status]);
+
+    if (status === "authenticated") {
+      // Redirect if user is authenticated
+      console.log(session, "User session");
+      router.push("/home");
+    } else {
+      // Redirect to login if user is not authenticated
+      router.push("/login");
+    }
+  }, [status, session, router]);
+
+  // Render nothing while waiting for session to load
+  if (status === "loading") {
+    return null;
+  }
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-gray-100">
