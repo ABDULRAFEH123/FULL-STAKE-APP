@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
-import User from "../../../models/user"; // Make sure to import your User model correctly
+import User from "../../../../models/user"; // Make sure to import your User model correctly
 import { connectMongoDB } from "@/lib/mongodb";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);

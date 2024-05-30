@@ -22,7 +22,7 @@ export const ResetPassword = () => {
 
     try {
         setResetLoader(true);
-      const response = await fetch("/api/reset-password", {
+      const response = await fetch("/api/backend/reset-password", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

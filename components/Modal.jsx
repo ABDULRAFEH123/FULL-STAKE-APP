@@ -27,7 +27,7 @@ const Modal = ({ show, onClose }) => {
   // Function to update user details
   const updateUserDetails = async () => {
   
-    const response = await fetch("/api/updateprofile", {
+    const response = await fetch("/api/backend/updateprofile", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

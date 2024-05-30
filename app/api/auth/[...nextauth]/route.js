@@ -4,7 +4,10 @@ import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken"; // Import jwt for token generation
-
+import GoogleProvider from "next-auth/providers/google";
+import GithubProvider from "next-auth/providers/github";
+import FacebookProvider from "next-auth/providers/facebook";
+import LinkdinProvider from "next-auth/providers/linkedin";
 export const authOptions = {
   providers: [
     CredentialsProvider({
@@ -33,13 +36,80 @@ export const authOptions = {
         }
       },
     }),
+    GoogleProvider({
+      clientId: process.env.CLIENT_ID_GOOGLE,
+      clientSecret: process.env.CLIENT_SECRET_GOOGLE,
+      authorizationUrl:
+        "https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code",
+    }),
+    GithubProvider({
+      clientId: process.env.CLIENT_ID_GITHUB,
+      clientSecret: process.env.CLIENT_SECRET_GITHUB,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
+    }),
+    FacebookProvider({
+      clientId: process.env.CLIENT_ID_FACEBOOK,
+      clientSecret: process.env.CLIENT_SECRET_FACEBOOK,
+      authorizationUrl: "https://www.facebook.com/v10.0/dialog/oauth?scope=email,public_profile",
+      authorization: {
+        params: {
+          prompt: "login",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
+    }),
+    LinkdinProvider({
+      clientId: process.env.CLIENT_ID_LINKDIN,
+      clientSecret: process.env.CLIENT_SECRET_LINKDIN,
+      authorization: {
+        params: { scope: "openid profile email" },
+        url: "https://www.linkedin.com/oauth/v2/authorization",
+      },
+      tokenUrl: "https://www.linkedin.com/oauth/v2/accessToken",
+      profileUrl: "https://api.linkedin.com/v2/userinfo",
+      authorizationUrl: "https://www.linkedin.com/oauth/v2/authorization",
+      jwks_endpoint: "https://www.linkedin.com/oauth/openid/jwks",
+      issuer: "https://www.linkedin.com/oauth",
+    }),
   ],
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // Session expiration time in seconds
   },
   callbacks: {
-    async signIn({ account, profile }) {
+    async signIn({ account, user }) {
+      // console.log(account,"its account")
+      // console.log(user,"its user")
+      await connectMongoDB();
+      if (["google", "github", "facebook","linkdin"].includes(account.provider)) {
+        // Check if user exists in the database
+        let newUser = await User.findOne({ email: user.email });
+        if (!newUser) {
+          // If user doesn't exist, create a new user
+          newUser = await User.create({
+            email: user.email,
+            name: user.name,
+            password: user.password,
+            location: "", // You can update these values later
+            about: "",
+            subscription: {
+              status: "inactive",
+              subscriptionId: null,
+              createdDate: null,
+              endingDate: null,
+              planId: null,
+              active: false,
+            },
+          });
+        }
+      }
       return true;
     },
     jwt: async ({ token, user, account, trigger, session }) => {
@@ -60,7 +130,9 @@ export const authOptions = {
         token.name = user.name;
         token.location = user.location;
         token.about = user.about;
-        token.subscription = user.subscription ? user.subscription.status : 'inactive'; // Add subscription status
+        token.subscription = user.subscription
+          ? user.subscription.status
+          : "inactive"; // Add subscription status
         // Generate access token using jwt.sign
         token.accessToken = jwt.sign(
           { userId: user._id },
@@ -82,9 +154,13 @@ export const authOptions = {
           session.user.accessToken = token.accessToken;
         }
       }
-      console.log(session,"its overall session..");
+      console.log(session, "its overall session..");
 
       return session;
+    },
+    // REDIRECT USER TO HOME PAGE AFTER THE LOGIN..
+    async redirect({ url, baseUrl }) {
+      return baseUrl + "/home";
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

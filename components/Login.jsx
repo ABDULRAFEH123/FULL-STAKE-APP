@@ -6,24 +6,21 @@ import logo from "../public/logo.png";
 import Link from "next/link";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from 'react';
+import { useEffect } from "react";
 import { ImSpinner8 } from "react-icons/im";
+import SocialButtons from "./SocialButtons";
 
 export default function Login() {
-  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const [loginLoader,setLoginLoader]=useState(false);
-  const { data: session } = useSession(); 
+  const [loginLoader, setLoginLoader] = useState(false);
+  const { data: session } = useSession();
 
   // console.log(userId,"its///")
 
-
   const handleSubmit = async (e) => {
-  
-    
     e.preventDefault();
     try {
       setLoginLoader(true);
@@ -41,11 +38,11 @@ export default function Login() {
       router.replace("/home");
     } catch (error) {
       setLoginLoader(false);
-      console.log(error)
+      console.log(error);
     }
   };
   return (
-    <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+    <div className="flex min-h-full flex-col justify-center px-6 pt-[20px] lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Image
           className="mx-auto w-auto"
@@ -60,7 +57,7 @@ export default function Login() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <form  onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-2">
           <div>
             <label
               htmlFor="email"
@@ -109,26 +106,33 @@ export default function Login() {
               type="submit"
               className="flex justify-center w-full rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
-                  {loginLoader ? (
-                  <ImSpinner8 className="spinning_icon" />
-                ) : (
-                  "Login"
-                )}
-             
+              {loginLoader ? <ImSpinner8 className="spinning_icon" /> : "Login"}
             </button>
           </div>
+          <div className="flex items-center justify-center w-full my-4">
+            <hr className="flex-1 border-t border-gray-300" />
+            <span className="px-4 text-gray-500 font-semibold">OR</span>
+            <hr className="flex-1 border-t border-gray-300" />
+          </div>
+
+          
+           
+          
         </form>
+        <SocialButtons />
         <div className="text-sm flex justify-between">
           <Link
-          href={'/verifyemail'}
+            href={"/verifyemail"}
             className="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none"
           >
             Forgot password?
           </Link>
-          
-          <Link href={"/signup"}
-            className="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none">
-             Signup
+
+          <Link
+            href={"/signup"}
+            className="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none"
+          >
+            Signup
           </Link>
         </div>
       </div>

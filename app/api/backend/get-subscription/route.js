@@ -1,6 +1,6 @@
 // /api/get-subscription.js
 import { connectMongoDB } from "@/lib/mongodb";
-import User from "../../../models/user"; // Adjust the import based on your directory structure
+import User from "../../../../models/user"; // Adjust the import based on your directory structure
 import { NextResponse } from "next/server";
 
 export async function POST(req, res) {

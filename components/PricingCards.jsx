@@ -93,7 +93,7 @@ const PricingCards = () => {
 
   const fetchSubscription = async (email) => {
     try {
-      const response = await fetch("/api/get-subscription", {
+      const response = await fetch("/api/backend/get-subscription", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -150,7 +150,7 @@ const PricingCards = () => {
 
     setLoadingPlan(priceId);
     try {
-      const response = await fetch("/api/payment-subscribe", {
+      const response = await fetch("/api/backend/payment-subscribe", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -181,7 +181,7 @@ const PricingCards = () => {
 
     try {
       setLoadingPlan(true);
-      const response = await fetch("/api/payment-unsubscribe", {
+      const response = await fetch("/api/backend/payment-unsubscribe", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

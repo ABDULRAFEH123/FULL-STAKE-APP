@@ -23,7 +23,7 @@ export default function VerifyEmail() {
     }
     try {
       setEmailLoader(true);
-      const res = await fetch("/api/verifyemail", {
+      const res = await fetch("/api/backend/verifyemail", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

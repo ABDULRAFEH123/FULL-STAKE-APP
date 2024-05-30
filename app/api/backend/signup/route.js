@@ -19,6 +19,8 @@ export async function POST(req) {
       password: hashedPassword,
       location:"",
       about:"",
+      otp:"",
+      otpExpiry:"",
       subscription: { // default values for new users
         status: "inactive", // assume 'inactive' until they subscribe
         planId: null,

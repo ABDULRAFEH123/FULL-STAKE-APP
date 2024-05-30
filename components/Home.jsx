@@ -3,6 +3,8 @@ import { signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
 import UpdateProfile from "./UpdateProfile";
 import PricingCards from "./PricingCards";
+import { FaExclamationTriangle } from "react-icons/fa";
+import PhoneVerification from "./PhoneVerification";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -37,7 +39,12 @@ export default function Home() {
   return (
     <>
       <div className="flex justify-between items-center bg-gray-800 text-white p-4">
-        <div className="text-lg font-bold"><UpdateProfile/></div>
+        <div className="flex justify-between">
+          <div className="text-lg font-bold">
+            <UpdateProfile />
+          </div>
+        </div>
+
         <div className="flex items-center gap-4">
           <div>
             <span className="font-semibold">Name:</span> {session?.user?.name}
@@ -53,6 +60,9 @@ export default function Home() {
           </button>
         </div>
       </div>
+      {/* *************************PH VERIFICATION **************************** */}
+      <PhoneVerification />
+      {/* ************************* STRIPE SUBSCRIPTION CARDS ****************** */}
       <PricingCards />
     </>
   );

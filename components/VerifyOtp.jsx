@@ -81,7 +81,7 @@ export default function VerifyOtp() {
     const otp = inputs.join("");
     try {
       setOtpLoader(true);
-      const response = await fetch("/api/verifyotp", {
+      const response = await fetch("/api/backend/verifyotp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

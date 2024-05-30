@@ -6,23 +6,32 @@ import dotenv from "dotenv";
 
 dotenv.config();
 const subscriptionSchema = new mongoose.Schema({
-  status: { type: String, enum: ['inactive', 'pending', 'active'], default: 'inactive' },
+  status: {
+    type: String,
+    enum: ["inactive", "pending", "active"],
+    default: "inactive",
+  },
   subscriptionId: { type: String, default: null },
   planId: { type: String, default: null },
   createdDate: { type: Date, default: null },
   endingDate: { type: Date, default: null },
-  active: { type: Boolean, default: false }
+  active: { type: Boolean, default: false },
 });
 
 // Define the schema
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  location: { type: String, default: '' },
-  about: { type: String, default: '' },
-  subscription: { type: subscriptionSchema, default: () => ({}) }
-}, { timestamps: true });
+const userSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    location: { type: String, default: "" },
+    about: { type: String, default: "" },
+    otp: { type: String }, // Ensure this is defined
+    otpExpiry: { type: Date }, // Ensure this is defined
+    subscription: { type: subscriptionSchema, default: () => ({}) },
+  },
+  { timestamps: true }
+);
 
 // Ensure the model is singleton
 const User = mongoose.models.User || mongoose.model("User", userSchema);
@@ -48,18 +57,18 @@ async function normalizeSubscriptionFields() {
 
   try {
     const result = await User.updateMany(
-      { "subscription": { $exists: false } },
+      { subscription: { $exists: false } },
       {
         $set: {
-          "subscription": { 
-            "status": "inactive",
-            "subscriptionId": null, 
-            "createdDate": null,
-            "endingDate": null,
-            "active": false,
-            "planId": null,
-          }
-        }
+          subscription: {
+            status: "inactive",
+            subscriptionId: null,
+            createdDate: null,
+            endingDate: null,
+            active: false,
+            planId: null,
+          },
+        },
       },
       { multi: true }
     );
@@ -72,25 +81,26 @@ async function normalizeSubscriptionFields() {
 // Function to update all users
 let fieldsInitialized = false;
 
-
 async function addFieldsToUsers() {
-  // so i commment some code here.. beacsue. of the issue and the issue is that when i buy 
+  // so i commment some code here.. beacsue. of the issue and the issue is that when i buy
   // the subscription then this fucntion call on every ctrl+s... and this fucntion add new fields...
   // to the db due to that ..things my new data overwrite and as a result .. my old subs data lost...
-
+  console.log("called..");
   if (!fieldsInitialized) {
     await normalizeSubscriptionFields();
 
     // const priceId = "not found";
 
-  
     try {
       const result = await User.updateMany(
         {},
         {
           $set: {
-            location: "",
-            about: "",
+            // location: "",
+            // about: "",
+            // otp: "",
+            // otpExpiry: "",
+
             // "subscription.status": "inactive",
             // "subscription.subscriptionId": null,
             // "subscription.createdDate": null,
@@ -103,14 +113,11 @@ async function addFieldsToUsers() {
       );
       // console.log('Updated users:', result);
 
-
-
       fieldsInitialized = true; // Update flag to indicate fields are added
     } catch (error) {
       console.error("Error updating users:", error);
     }
   }
-
 }
 
 export { User, connectMongoDB, addFieldsToUsers };

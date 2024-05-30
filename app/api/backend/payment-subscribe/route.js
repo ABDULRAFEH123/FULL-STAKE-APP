@@ -1,7 +1,7 @@
 // /api/payment/route.js
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
-import User from "../../../models/user"; // Make sure to import your User model correctly
+import User from "../../../../models/user"; // Make sure to import your User model correctly
 import { connectMongoDB } from "@/lib/mongodb";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -21,8 +21,8 @@ export async function POST(req) {
         },
       ],
       mode: "subscription",
-      success_url: process.env.SUCCESS_REDIRECT_STRIPE_LINK,
-      cancel_url: process.env.CANCEL_REDIRECT_STRIPE_LINK,
+      success_url: process.env.SUCCESS_REDIRECT_LOCAL_LINK,
+      cancel_url: process.env.CANCEL_REDIRECT_LOCAL_LINK,
       customer_email: email, 
     });
 

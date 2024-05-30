@@ -26,7 +26,7 @@ export default function Signup() {
     // API to ensure that a user with the same email does not exist
     try {
       setSignupLoader(true)
-      const response = await fetch("/api/userexist", {
+      const response = await fetch("/api/backend/userexist", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,7 +44,7 @@ export default function Signup() {
       setSignupLoader(true);
 
       // Proceed with signup if user does not exist
-      const res = await fetch("/api/signup", {
+      const res = await fetch("/api/backend/signup", {
 
         method: "POST",
         headers: {
